@@ -13,7 +13,7 @@ namespace Off_brand_Minecraft
         public bool targetExists;
         public short[,,]? blocks;
         public short[,,]? destructionLevels;
-        //public bool[,,]? blockPowering;
+        short[] destructionSpeeds = { 0, 0, 5, 15, 15, 15, 10, 25 };
         readonly Random r = new();
         public SolidBrush[] brushes = new SolidBrush[8];
         public float[,] Rref(float[,] Matrix)
@@ -672,17 +672,9 @@ namespace Off_brand_Minecraft
         }
         public void DestroyBlock(int[] targetedSurface, ref bool blockDestruction)
         {
-            short breakspeed;
             if (targetExists) //förstör det valda blocket
             { 
-                if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 4) breakspeed = 15; //hur snabbt de olika blocken förstörs
-                else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 3) breakspeed = 15;
-                else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 2) breakspeed = 5;
-                else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 1) breakspeed = 0;
-                else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 6) breakspeed = 10;
-                else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 7) breakspeed = 25;
-                else breakspeed = 2;
-                destructionLevels[targetedSurface[0], targetedSurface[1], targetedSurface[2]] -= breakspeed;
+                destructionLevels[targetedSurface[0], targetedSurface[1], targetedSurface[2]] -= destructionSpeeds[blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]]];
                 if (destructionLevels[targetedSurface[0], targetedSurface[1], targetedSurface[2]] <= 0)
                 {
                     blockDestruction = true;

@@ -249,18 +249,6 @@ namespace Off_brand_Minecraft
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Up)
-                try
-                {
-                player.playerPos[1] += 30;
-                }
-                catch { }
-            if (e.KeyCode == Keys.Down)
-                try
-                {
-                player.playerPos[1] -= 30;
-                }
-                catch { }
             if (e.KeyCode == Keys.Left)
                 try 
                 { 
