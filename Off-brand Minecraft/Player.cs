@@ -13,6 +13,7 @@ namespace Off_brand_Minecraft
         //värld
         public bool playerIsInWorld = false;
         public short worldWithPlayer = 0;
+
         //perspektiv
         public double[] playerPos = new double[3];
         public double[] playerPerspective = new double[2];
@@ -554,7 +555,7 @@ namespace Off_brand_Minecraft
                 if (blockCollected) break;
             }
         }
-        public void InteractWithBlock(ref bool[,,] blockPowering) //om ett redstonesystem hade lagts till
+        public void InteractWithBlock(ref bool[,,] blockPowering) //om klickbara block hade lagts till
         {
             blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]] = !blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]];
         }

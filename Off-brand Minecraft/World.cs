@@ -104,6 +104,61 @@ namespace Off_brand_Minecraft
         {
             return Math.Acos((Math.Pow(a, 2) + Math.Pow(b, 2) - Math.Pow(c, 2)) / (2 * a * b));
         }
+        public float[,] PerlinNoiseMap(int[] worldSize, int maxGrid, int minGrid)
+        {
+            //OBS, detta är inte riktigt perlin noise utan endast en approximation av det vilket fungerar på ett fraktalliknande sätt och använder sig av bilinjär interpolation för att få fram hur står del av världens närstående frön som ska tas med
+            //riktig perlin noise innehåller vektorer vid varje korsning vars skalärprodukter mot vektorerna till en punkt i rutnätet bestämmer värdet på fröet
+            float[,] noiseMap = new float[worldSize[0], worldSize[2]];
+            float[,] seed = new float[worldSize[0], worldSize[2]];
+            Random seedGenerator = new Random();
+            for (int i = 0; i < worldSize[0]; i++)
+            {
+                for (int j = 0; j < worldSize[2]; j++)
+                {
+                    seed[i, j] = seedGenerator.Next(128) / 128f;
+                }
+            }
+            for (int i = maxGrid; i > minGrid; i--) //rutor som delar upp varandra i 2x2 steg
+            {
+                for (int j = 0; j < worldSize[0]; j++)
+                {
+                    for (int k = 0; k < worldSize[2]; k++)
+                    {
+                        int interval = (int)Math.Pow(2, i); //längden på en ruta
+                        int[] closestSeed = { j - j % interval, k - k % interval }; //avrundning nedåt för att få närmaste nedåtgående rutnätskorsning i båda axlarna
+                        int[] distanceFromClosestSeed = { j - closestSeed[0], k - closestSeed[1] }; //avståndet från den valda rutnätskorsningen
+                        if (j % interval == 0)
+                        {
+                            if (k % interval == 0) //om koordinaten är en rutnätskorsning
+                            {
+                                noiseMap[j, k] += seed[j, k] * interval / (float)Math.Pow(2, maxGrid); //slumpkoordinaten är sig själv
+                            }
+                            else //om koordinaten enbart korsar med en horisontell linje
+                            {
+                                noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +  //ett medelmått mellan övre och nedre rutnätskorsning
+                                                    seed[closestSeed[0], closestSeed[1] + interval] * (interval - distanceFromClosestSeed[0]) * distanceFromClosestSeed[1])     //med avseende på avståndet till varje korsning
+                                                    / (float)(interval * Math.Pow(2, maxGrid)); //dessa är till för att göra så att de mindre rutorna har en mindre inverkan på resultatet så att slumpandet blir mjukare d.v.s pseudoslumpartat
+                            }
+                        }
+                        else if (k % interval == 0) //om koordinaten enbart korsar med en vertikal linje
+                        {
+                            noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +   //ett medelmått mellan vänster och höger rutnätskorsning
+                                                seed[closestSeed[0] + interval, closestSeed[1]] * distanceFromClosestSeed[0] * (interval - distanceFromClosestSeed[1]))     //med avseende på avståndet till varje korsning
+                                                / (float)(interval * Math.Pow(2, maxGrid));
+                        }
+                        else //om koordinaten inte korsar någon
+                        {
+                            noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +  //ett medelmått mellan övre, nedre, vänster och höger rutnätskorsning
+                                                seed[closestSeed[0] + interval, closestSeed[1]] * distanceFromClosestSeed[0] * (interval - distanceFromClosestSeed[1]) +    //med avseende på avståndet till varje korsning
+                                                seed[closestSeed[0], closestSeed[1] + interval] * (interval - distanceFromClosestSeed[0]) * distanceFromClosestSeed[1] +
+                                                seed[closestSeed[0] + interval, closestSeed[1] + interval] * distanceFromClosestSeed[0] * distanceFromClosestSeed[1])
+                                                / (float)(interval * Math.Pow(2, maxGrid));
+                        }
+                    }
+                }
+            }
+            return noiseMap;
+        }
         public void GenerateWorld(ref double[] pos, ref SolidBrush[] brushes, int[] worldSize, int maxGrid)
         {
             worldDimensions = worldSize;
@@ -191,61 +246,6 @@ namespace Off_brand_Minecraft
             }
             pos[1] = heightAtSpawn;
         }
-        public float[,] PerlinNoiseMap(int[] worldSize, int maxGrid, int minGrid)
-        {
-            //OBS, detta är inte riktigt perlin noise utan endast en approximation av det vilket fungerar på ett fraktalliknande sätt och använder sig av bilinjär interpolation för att få fram hur står del av världens närstående frön som ska tas med
-            //riktig perlin noise innehåller vektorer vid varje korsning vars skalärprodukter mot vektorerna till en punkt i rutnätet bestämmer värdet på fröet
-            float[,] noiseMap = new float[worldSize[0], worldSize[2]];
-            float[,] seed = new float[worldSize[0], worldSize[2]];
-            Random seedGenerator = new Random();
-            for (int i = 0; i < worldSize[0]; i++)
-            {
-                for (int j = 0; j < worldSize[2]; j++)
-                {
-                    seed[i, j] = seedGenerator.Next(128) / 128f;
-                }
-            }
-            for (int i = maxGrid; i > minGrid; i--) //rutor som delar upp varandra i 2x2 steg
-            {
-                for (int j = 0; j < worldSize[0]; j++)
-                {
-                    for (int k = 0; k < worldSize[2]; k++)
-                    {
-                        int interval = (int)Math.Pow(2, i); //längden på en ruta
-                        int[] closestSeed = { j - j % interval, k - k % interval }; //avrundning nedåt för att få närmaste nedåtgående rutnätskorsning i båda axlarna
-                        int[] distanceFromClosestSeed = { j - closestSeed[0], k - closestSeed[1] }; //avståndet från den valda rutnätskorsningen
-                        if (j % interval == 0)
-                        {
-                            if (k % interval == 0) //om koordinaten är en rutnätskorsning
-                            {
-                                noiseMap[j, k] += seed[j, k] * interval / (float)Math.Pow(2, maxGrid); //slumpkoordinaten är sig själv
-                            }
-                            else //om koordinaten enbart korsar med en horisontell linje
-                            {
-                                noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +  //ett medelmått mellan övre och nedre rutnätskorsning
-                                                    seed[closestSeed[0], closestSeed[1] + interval] * (interval - distanceFromClosestSeed[0]) * distanceFromClosestSeed[1])     //med avseende på avståndet till varje korsning
-                                                    / (float)(interval * Math.Pow(2, maxGrid)); //dessa är till för att göra så att de mindre rutorna har en mindre inverkan på resultatet så att slumpandet blir mjukare d.v.s pseudoslumpartat
-                            }
-                        }
-                        else if (k % interval == 0) //om koordinaten enbart korsar med en vertikal linje
-                        {
-                            noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +   //ett medelmått mellan vänster och höger rutnätskorsning
-                                                seed[closestSeed[0] + interval, closestSeed[1]] * distanceFromClosestSeed[0] * (interval - distanceFromClosestSeed[1]))     //med avseende på avståndet till varje korsning
-                                                / (float)(interval * Math.Pow(2, maxGrid));
-                        }
-                        else //om koordinaten inte korsar någon
-                        {
-                            noiseMap[j, k] += (seed[closestSeed[0], closestSeed[1]] * (interval - distanceFromClosestSeed[0]) * (interval - distanceFromClosestSeed[1]) +  //ett medelmått mellan övre, nedre, vänster och höger rutnätskorsning
-                                                seed[closestSeed[0] + interval, closestSeed[1]] * distanceFromClosestSeed[0] * (interval - distanceFromClosestSeed[1]) +    //med avseende på avståndet till varje korsning
-                                                seed[closestSeed[0], closestSeed[1] + interval] * (interval - distanceFromClosestSeed[0]) * distanceFromClosestSeed[1] +
-                                                seed[closestSeed[0] + interval, closestSeed[1] + interval] * distanceFromClosestSeed[0] * distanceFromClosestSeed[1])
-                                                / (float)(interval * Math.Pow(2, maxGrid));
-                        }
-                    }
-                }
-            }
-            return noiseMap;
-        }
         public void GenerateOak(ref short[,,] world, int[] baseblock)
         {
             Random trunkRandomizer = new Random();
@@ -292,7 +292,7 @@ namespace Off_brand_Minecraft
                 }
             }
         }
-        public void Draw3DWorld(Graphics g, short[,,] blocks, double[] pos, double[] playerPerspective, Size screen, SolidBrush[] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize)
+        public void Draw3DWorld(Graphics g, short[,,] blocks, double[] pos, double[] playerPerspective, Size screen, SolidBrush[] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize, bool worldIsMenu)
         {
             Point screenCenter = new Point();
             screenCenter.X = screen.Width / 2;
@@ -658,7 +658,7 @@ namespace Off_brand_Minecraft
                     }
                 }
             }
-            if(targetExists) g.DrawPolygon(Pens.Red, targetedPoints); //markerar den valda ytan på det valda blocket
+            if(targetExists && !worldIsMenu) g.DrawPolygon(Pens.Red, targetedPoints); //markerar den valda ytan på det valda blocket om världen inte är menyvärlden
         }
         private void ChooseOffsets(ref int[,] relativePoints, int[] offsets, int[] Coords, int[] playerPos)
         {

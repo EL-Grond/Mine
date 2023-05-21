@@ -49,22 +49,30 @@ namespace Off_brand_Minecraft
             cbxInvertY.Location = new Point(this.Width / 2 + cbxInvertY.Width / 2, worldMenu[0].Top + 50);
 
         }
+        //sessionens världar
+        readonly World[] map = { new World() , new World(), new World(), new World(), new World(), new World(), new World(), new World() };
+        double[,] savedPositions = new double[9, 3];
+        short[,,,] savedInventories = new short[8, 10, 3, 2];
+        short[,,] savedHotBars = new short[8, 10, 2];
 
-        readonly World[] map = { new World() , new World(), new World(), new World(), new World(), new World(), new World(), new World() }; //sessionens världar
+        //meny
         readonly World menu = new World();
+        int[] menuSize = { 129, 256, 129 };
+
+        //spelaren
         Player player = new Player();
+        bool blockDestruction = false;
+
+        //indikatorer för menyer
         bool draw;
         bool pause;
         bool gameMenu = false;
         bool mainMenu = false;
         bool drawMenu;
+
+        //grafik
         int renderDistance = 60;
-        bool blockDestruction = false;
         bool goodGraphics = true;
-        double[,] savedPositions = new double[9, 3];
-        short[,,,] savedInventories = new short[8, 10, 3, 2];
-        short[,,] savedHotBars = new short[8, 10, 2];
-        int[] menuSize = { 129, 256, 129 };
 
         private void tickSpeed_Tick(object sender, EventArgs e) //varje ms sker detta
         {
@@ -267,6 +275,7 @@ namespace Off_brand_Minecraft
             }
             if(e.KeyCode == Keys.Escape) //stäng spelet eller öppna spelmenyn
             {
+                btnControls.Text = "Controls";
                 lbxControls.Visible = false;
                 lbxControls.Enabled = false;
                 cbxInvertY.Visible = false;
@@ -450,7 +459,7 @@ namespace Off_brand_Minecraft
             if (draw && !mainMenu) //rita värld och spelarens gränssnitt
             {
 
-                map[player.worldWithPlayer].Draw3DWorld(e.Graphics, map[player.worldWithPlayer].blocks, player.playerPos, player.playerPerspective, this.Size, map[player.worldWithPlayer].brushes, renderDistance, ref player.targetedSurface, goodGraphics, map[player.worldWithPlayer].worldDimensions);
+                map[player.worldWithPlayer].Draw3DWorld(e.Graphics, map[player.worldWithPlayer].blocks, player.playerPos, player.playerPerspective, this.Size, map[player.worldWithPlayer].brushes, renderDistance, ref player.targetedSurface, goodGraphics, map[player.worldWithPlayer].worldDimensions, false);
                 e.Graphics.DrawLine(Pens.Black, this.Width / 2, this.Height / 2 - 10, this.Width / 2, this.Height / 2 + 10);
                 e.Graphics.DrawLine(Pens.Black, this.Width / 2 - 10, this.Height / 2, this.Width / 2 + 10, this.Height / 2);
                 player.DrawGUI(e.Graphics, this.Size, Cursor.Position);
@@ -458,7 +467,7 @@ namespace Off_brand_Minecraft
             }
             if (drawMenu) //rita menybakgrunden
             {
-                menu.Draw3DWorld(e.Graphics, menu.blocks, player.playerPos, player.playerPerspective, this.Size, menu.brushes, renderDistance, ref player.targetedSurface, goodGraphics, menu.worldDimensions);
+                menu.Draw3DWorld(e.Graphics, menu.blocks, player.playerPos, player.playerPerspective, this.Size, menu.brushes, renderDistance, ref player.targetedSurface, goodGraphics, menu.worldDimensions, true);
                 drawMenu = false;
             }
         }
