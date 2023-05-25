@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.IO.MemoryMappedFiles;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace Off_brand_Minecraft
@@ -513,8 +514,29 @@ namespace Off_brand_Minecraft
             }
             if (e.Button == MouseButtons.Right && pause)
             {
-                player.playerIsDestorying = true; //hugg block
-                player.RefreshHotBarAmountIndicatorValues();
+                bool playerCanAbsorbBlock = false; //bestäm om spelaren kan plocka upp det förstörda blocket
+                for(int i = 0; i < 10; i++)
+                {
+                    if (player.hotBar[i, 0] == 0 || (player.hotBar[i, 1] == map[player.worldWithPlayer].blocks[player.targetedSurface[0], player.targetedSurface[1], player.targetedSurface[2]] && player.hotBar[i, 0] < 64)) //bestäm om den kan plockas upp i hotbaren
+                    {
+                        playerCanAbsorbBlock = true;
+                        break;
+                    }
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (player.inventory[i, j, 0] == 0 || (player.inventory[i,j,1] == map[player.worldWithPlayer].blocks[player.targetedSurface[0], player.targetedSurface[1], player.targetedSurface[2]] && player.inventory[i,j, 0] < 64)) //bestäm om den kan plockas upp i inventariet
+                        {
+                            playerCanAbsorbBlock = true;
+                            break;
+                        }
+                    }
+                    if (playerCanAbsorbBlock) break;
+                }
+                if (playerCanAbsorbBlock)
+                {
+                    player.playerIsDestorying = true; //hugg block
+                    player.RefreshHotBarAmountIndicatorValues();
+                }
             }
             if (e.Button == MouseButtons.Left && pause) //sätt ut block
             {
