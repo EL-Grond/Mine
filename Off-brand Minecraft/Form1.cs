@@ -117,7 +117,26 @@ namespace Off_brand_Minecraft
                 {
                     if (player.playerIsDestorying) //spelaren siktar på ett block och slår
                     {
-                        map[player.worldWithPlayer].DestroyBlock(player.targetedSurface, ref blockDestruction);
+                        int targetedBlockCode = map[player.worldWithPlayer].blocks[player.targetedSurface[0], player.targetedSurface[1], player.targetedSurface[2]];
+                        bool playerCanAbsorbBlock = false; //bestäm om spelaren kan plocka upp det förstörda blocket
+                        for (int i = 0; i < 10; i++)
+                        {
+                            if (player.hotBar[i, 0] == 0 || (player.hotBar[i, 0] == targetedBlockCode && player.hotBar[i, 1] < 64)) //bestäm om den kan plockas upp i hotbaren
+                            {
+                                playerCanAbsorbBlock = true;
+                                break;
+                            }
+                            for (int j = 0; j < 3; j++)
+                            {
+                                if (player.inventory[i, j, 0] == 0 || (player.inventory[i, j, 0] == targetedBlockCode && player.inventory[i, j, 1] < 64)) //bestäm om den kan plockas upp i inventariet
+                                {
+                                    playerCanAbsorbBlock = true;
+                                    break;
+                                }
+                            }
+                            if (playerCanAbsorbBlock) break;
+                        }
+                        if(playerCanAbsorbBlock) map[player.worldWithPlayer].DestroyBlock(player.targetedSurface, ref blockDestruction);
                     }
                     if (blockDestruction)
                     {
@@ -514,29 +533,8 @@ namespace Off_brand_Minecraft
             }
             if (e.Button == MouseButtons.Right && pause)
             {
-                bool playerCanAbsorbBlock = false; //bestäm om spelaren kan plocka upp det förstörda blocket
-                for(int i = 0; i < 10; i++)
-                {
-                    if (player.hotBar[i, 0] == 0 || (player.hotBar[i, 1] == map[player.worldWithPlayer].blocks[player.targetedSurface[0], player.targetedSurface[1], player.targetedSurface[2]] && player.hotBar[i, 0] < 64)) //bestäm om den kan plockas upp i hotbaren
-                    {
-                        playerCanAbsorbBlock = true;
-                        break;
-                    }
-                    for (int j = 0; j < 3; j++)
-                    {
-                        if (player.inventory[i, j, 0] == 0 || (player.inventory[i,j,1] == map[player.worldWithPlayer].blocks[player.targetedSurface[0], player.targetedSurface[1], player.targetedSurface[2]] && player.inventory[i,j, 0] < 64)) //bestäm om den kan plockas upp i inventariet
-                        {
-                            playerCanAbsorbBlock = true;
-                            break;
-                        }
-                    }
-                    if (playerCanAbsorbBlock) break;
-                }
-                if (playerCanAbsorbBlock)
-                {
-                    player.playerIsDestorying = true; //hugg block
-                    player.RefreshHotBarAmountIndicatorValues();
-                }
+                player.playerIsDestorying = true; //hugg block
+                player.RefreshHotBarAmountIndicatorValues();
             }
             if (e.Button == MouseButtons.Left && pause) //sätt ut block
             {

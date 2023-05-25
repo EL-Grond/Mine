@@ -236,8 +236,14 @@ namespace Off_brand_Minecraft
             }
             if (inventoryIsOpen) //rita inventariets innehåll
             {
-                g.FillRectangle(Brushes.DarkGray, 3 * screen.Width / 16 - screen.Width / 40, 3 * screen.Height / 4 - 3 * screen.Width / 16 - screen.Width / 40, 10 * screen.Width / 16 + screen.Width / 20, 3 * screen.Width / 16 + screen.Width / 20);
+                g.FillRectangle(Brushes.DarkGray, 3 * screen.Width / 16 - screen.Width / 40, 3 * screen.Height / 4 - 3 * screen.Width / 16 - screen.Width / 40, 10 * screen.Width / 16 + screen.Width / 20, 3 * screen.Width / 16 + screen.Width / 20); //rita inventory
                 g.DrawRectangle(pen, 3 * screen.Width / 16 - screen.Width / 40, 3 * screen.Height / 4 - 3 * screen.Width / 16 - screen.Width / 40, 10 * screen.Width / 16 + screen.Width / 20, 3 * screen.Width / 16 + screen.Width / 20);
+
+                g.FillRectangle(Brushes.DarkGray, 2 * screen.Width / 16 - screen.Width / 40, screen.Height / 2 - screen.Width / 40, screen.Width / 16, screen.Width / 16); //rita bakgrund för raderingsruta
+                g.DrawRectangle(pen, 2 * screen.Width / 16 - screen.Width / 40, screen.Height / 2 - screen.Width / 40, screen.Width / 16, screen.Width / 16);
+
+                g.FillRectangle(Brushes.Red, 2 * screen.Width / 16 - screen.Width / 60, screen.Height / 2 - screen.Width / 60, screen.Width / 16 - screen.Width / 60, screen.Width / 16 - screen.Width / 60); //rita raderingsruta
+                g.DrawRectangle(pen, 2 * screen.Width / 16 - screen.Width / 60, screen.Height / 2 - screen.Width / 60, screen.Width / 16 - screen.Width / 60, screen.Width / 16 - screen.Width / 60);
                 for (int i = 0; i < 10; i++)
                 {
                     for (int j = 0; j < 3; j++)
@@ -385,6 +391,10 @@ namespace Off_brand_Minecraft
 
                     }
                 }      
+            }
+            else if (cursor.X > 2 * screen.Width / 16 - screen.Width / 60 && cursor.Y > screen.Height / 2 - screen.Width / 60 && cursor.X < 3 * screen.Width / 16 - screen.Width / 60 && cursor.Y < 9 * screen.Height / 16 - screen.Width / 60) //om pekaren är över raderingsrutan raderas det som pekaren håller i
+            {
+                for (int i = 0; i < 2; i++) pickedStack[i] = 0;
             }
         }
         public void PickUpHalf(ref short[] pickedStack, Point cursor, Size screen) //plocka upp hälften av blocken
