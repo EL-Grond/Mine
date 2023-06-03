@@ -29,7 +29,7 @@ namespace Off_brand_Minecraft
         public short[] pickedUpBlock = new short[2];
         public int hotBarTarget = 0;
         public bool inventoryIsOpen = false;
-        public short heldBlock = 3;
+        public short heldBlock = 0;
         short stackSize = 64;
 
         //rörelse
@@ -164,7 +164,7 @@ namespace Off_brand_Minecraft
                 else playerPos[2] += distanceToStop[5];
             }
         }
-        public void PlayerPlaceBlock(ref short[,,] blocks)
+        public void PlayerPlaceBlock(ref short[,,] blocks, ref bool[,,] blockPowering)
         {
             if(heldBlock != 0) //placera block om spelaren håller i ett block
             {
@@ -190,6 +190,10 @@ namespace Off_brand_Minecraft
                 }
                 catch { }
             }
+            else if (blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]] == 5)
+            {
+                blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]] = !blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]];
+            }
         }
         public void DrawGUI(Graphics g, Size screen, Point cursor)
         {
@@ -200,6 +204,7 @@ namespace Off_brand_Minecraft
             brushes[2] = new SolidBrush(Color.Gray);
             brushes[3] = new SolidBrush(Color.SaddleBrown);
             brushes[4] = new SolidBrush(Color.Green);
+            brushes[5] = new SolidBrush(Color.Blue);
             brushes[6] = new SolidBrush(Color.FromArgb(145, 82, 45));
             brushes[7] = new SolidBrush(Color.LawnGreen);
 
@@ -564,10 +569,6 @@ namespace Off_brand_Minecraft
                 }
                 if (blockCollected) break;
             }
-        }
-        public void InteractWithBlock(ref bool[,,] blockPowering) //om klickbara block hade lagts till
-        {
-            blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]] = !blockPowering[targetedSurface[0], targetedSurface[1], targetedSurface[2]];
         }
     }
 }

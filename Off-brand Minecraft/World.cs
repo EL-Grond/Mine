@@ -13,10 +13,12 @@ namespace Off_brand_Minecraft
         public bool targetExists;
         public short[,,]? blocks;
         public short[,,]? destructionLevels;
+        public bool[,,]? blockPowering;
+        public bool[,] blockConductivity = { { false, false }, { true, false }, { true, false }, { true, false }, { true, false }, { true, true }, { true, false }, { true, false }, { false, false } };
         short[] destructionSpeeds = { 0, 0, 5, 15, 15, 15, 10, 25 };
         readonly Random r = new();
         public SolidBrush[] brushes = new SolidBrush[8];
-        public float[,] Rref(float[,] Matrix)
+        public static float[,] Rref(float[,] Matrix)
         {
             if (Matrix[0,0] == 0) //element (0,0) får inte vara 0, därför flyttas raderna för att sätta en rad där element 1 != 0
             {
@@ -164,6 +166,7 @@ namespace Off_brand_Minecraft
             worldDimensions = worldSize;
             blocks = new short[worldSize[0], worldSize[1], worldSize[2]]; //en array av alla blockoder för att se vilket block som befinner sig på varje koordinat
             destructionLevels = new short[worldSize[0], worldSize[1], worldSize[2]]; //en array förstörelsenivåer för att lagra hur mycket hälsa varje block har
+            blockPowering = new bool[worldSize[0], worldSize[1], worldSize[2]]; //en array som visar om ett block får kraft eller inte
             brushes[1] = new SolidBrush(Color.Black); //färger för de olika blocken
             brushes[2] = new SolidBrush(Color.Gray);
             brushes[3] = new SolidBrush(Color.SaddleBrown);
@@ -182,7 +185,8 @@ namespace Off_brand_Minecraft
             //Grass = 4
             //ClickCube = 5
             //Oak log = 6
-            //oak leaves = 7
+            //Oak leaves = 7
+            //Door = 8
             for (int i = 0; i < blocks.GetLength(0); i++)
             {
                 for (int j = 0; j < blocks.GetLength(1); j++)
@@ -292,7 +296,7 @@ namespace Off_brand_Minecraft
                 }
             }
         }
-        public void Draw3DWorld(Graphics g, short[,,] blocks, double[] pos, double[] playerPerspective, Size screen, SolidBrush[] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize, bool worldIsMenu)
+        public void Draw3DWorld(Graphics g, short[,,] blocks, bool[,,] blockPowering, double[] pos, double[] playerPerspective, Size screen, SolidBrush[] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize, bool worldIsMenu)
         {
             Point screenCenter = new Point();
             screenCenter.X = screen.Width / 2;
@@ -481,6 +485,16 @@ namespace Off_brand_Minecraft
                             if (blocks[Coords[0], Coords[1], Coords[2] + 1] == 0) visibleSides[4] = true;   //ovanifrån
                             if (blocks[Coords[0], Coords[1], Coords[2] - 1] == 0) visibleSides[5] = true;   //underifrång
                         }
+                        if (!blockConductivity[blocks[Coords[0], Coords[1], Coords[2]], 1]) blockPowering[Coords[0], Coords[1], Coords[2]] = false;
+                        if (blockPowering[Coords[0], Coords[1], Coords[2]] && blockConductivity[blocks[Coords[0], Coords[1], Coords[2]], 1])
+                        {
+                            if (blockConductivity[blocks[Coords[0] + 1, Coords[1], Coords[2]], 0] && !blockConductivity[blocks[Coords[0] + 1, Coords[1], Coords[2]], 1]) blockPowering[Coords[0] + 1, Coords[1], Coords[2]] = true;
+                            if (blockConductivity[blocks[Coords[0] - 1, Coords[1], Coords[2]], 0] && !blockConductivity[blocks[Coords[0] - 1, Coords[1], Coords[2]], 1]) blockPowering[Coords[0] - 1, Coords[1], Coords[2]] = true;
+                            if (blockConductivity[blocks[Coords[0], Coords[1] + 1, Coords[2]], 0] && !blockConductivity[blocks[Coords[0], Coords[1] + 1, Coords[2]], 1]) blockPowering[Coords[0], Coords[1] + 1, Coords[2]] = true;
+                            if (blockConductivity[blocks[Coords[0], Coords[1] - 1, Coords[2]], 0] && !blockConductivity[blocks[Coords[0], Coords[1] - 1, Coords[2]], 1]) blockPowering[Coords[0], Coords[1] - 1, Coords[2]] = true;
+                            if (blockConductivity[blocks[Coords[0], Coords[1], Coords[2] + 1], 0] && !blockConductivity[blocks[Coords[0], Coords[1], Coords[2] + 1], 1]) blockPowering[Coords[0], Coords[1], Coords[2] + 1] = true;
+                            if (blockConductivity[blocks[Coords[0], Coords[1], Coords[2] - 1], 0] && !blockConductivity[blocks[Coords[0], Coords[1], Coords[2] - 1], 1]) blockPowering[Coords[0], Coords[1], Coords[2] - 1] = true;
+                        }
                         for (int l = 0; l < visibleSides.Length; l++)
                         {
                             if (visibleSides[order[l]])
@@ -602,8 +616,10 @@ namespace Off_brand_Minecraft
 
                                 if (invisibleCorners <= 3)
                                 {
-                                    Pen borderPen = new Pen(Color.Black);
-                                    borderPen.Width = borderWidth;
+                                    Pen borderPen = new Pen(Color.Black)
+                                    {
+                                        Width = borderWidth
+                                    };
                                     if (Math.Sqrt(Math.Pow(relativePoints[0,0], 2) + Math.Pow(relativePoints[0, 1], 2) + Math.Pow(relativePoints[0, 2], 2)) <= 120)
                                     {
                                         double totalAngle = 0;
@@ -619,7 +635,30 @@ namespace Off_brand_Minecraft
                                             targetExists = true;            //säkertställer så att spelaren inte kan interagera med blocket i världen med koordinaterna [0,0,0]
                                         }
                                     }
-                                    if (blocks[Coords[0], Coords[1], Coords[2]] == 4) //gräsblock avviker då en sida är grön
+                                    if (blocks[Coords[0], Coords[1], Coords[2]] == 5) //om blocket är ett klickblock som ändrar färg beroende på om den är aktiverad eller ej
+                                    {
+                                        if (blockPowering[Coords[0], Coords[1], Coords[2]])
+                                        {
+                                            try
+                                            {
+                                                g.FillPolygon(Brushes.Red, screenPoints);
+                                                if (goodGraphics)
+                                                    g.DrawPolygon(borderPen, screenPoints);
+                                            }
+                                            catch { }
+                                        }
+                                        else
+                                        {
+                                            try
+                                            {
+                                                g.FillPolygon(Brushes.Blue, screenPoints);
+                                                if (goodGraphics)
+                                                    g.DrawPolygon(borderPen, screenPoints);
+                                            }
+                                            catch { }
+                                        }
+                                    }
+                                    else if (blocks[Coords[0], Coords[1], Coords[2]] == 4) //gräsblock avviker då en sida är grön
                                     {
                                         if (order[l] == 2)
                                         {

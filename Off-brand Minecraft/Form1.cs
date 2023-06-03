@@ -77,6 +77,7 @@ namespace Off_brand_Minecraft
 
         private void tickSpeed_Tick(object sender, EventArgs e) //varje ms sker detta
         {
+            player.heldBlock = player.hotBar[player.hotBarTarget, 0];
             draw = true;
             Invalidate();
             if (mainMenu) //spelaren är i huvudmenyn
@@ -277,6 +278,10 @@ namespace Off_brand_Minecraft
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
+            if(e.KeyCode == Keys.C)
+            {
+                player.PickUpDestroyedBlock(5);
+            }
             if (e.KeyCode == Keys.Left)
                 try 
                 { 
@@ -479,7 +484,7 @@ namespace Off_brand_Minecraft
             if (draw && !mainMenu) //rita värld och spelarens gränssnitt
             {
 
-                map[player.worldWithPlayer].Draw3DWorld(e.Graphics, map[player.worldWithPlayer].blocks, player.playerPos, player.playerPerspective, this.Size, map[player.worldWithPlayer].brushes, renderDistance, ref player.targetedSurface, goodGraphics, map[player.worldWithPlayer].worldDimensions, false);
+                map[player.worldWithPlayer].Draw3DWorld(e.Graphics, map[player.worldWithPlayer].blocks, map[player.worldWithPlayer].blockPowering, player.playerPos, player.playerPerspective, this.Size, map[player.worldWithPlayer].brushes, renderDistance, ref player.targetedSurface, goodGraphics, map[player.worldWithPlayer].worldDimensions, false);
                 e.Graphics.DrawLine(Pens.Black, this.Width / 2, this.Height / 2 - 10, this.Width / 2, this.Height / 2 + 10);
                 e.Graphics.DrawLine(Pens.Black, this.Width / 2 - 10, this.Height / 2, this.Width / 2 + 10, this.Height / 2);
                 player.DrawGUI(e.Graphics, this.Size, Cursor.Position);
@@ -487,7 +492,7 @@ namespace Off_brand_Minecraft
             }
             if (drawMenu) //rita menybakgrunden
             {
-                menu.Draw3DWorld(e.Graphics, menu.blocks, player.playerPos, player.playerPerspective, this.Size, menu.brushes, renderDistance, ref player.targetedSurface, goodGraphics, menu.worldDimensions, true);
+                menu.Draw3DWorld(e.Graphics, menu.blocks, menu.blockPowering, player.playerPos, player.playerPerspective, this.Size, menu.brushes, renderDistance, ref player.targetedSurface, goodGraphics, menu.worldDimensions, true);
                 drawMenu = false;
             }
         }
@@ -538,7 +543,7 @@ namespace Off_brand_Minecraft
             }
             if (e.Button == MouseButtons.Left && pause) //sätt ut block
             {
-                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks);
+                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks, ref map[player.worldWithPlayer].blockPowering);
                 player.RefreshHotBarAmountIndicatorValues();
             }
         }
