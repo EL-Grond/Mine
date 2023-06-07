@@ -164,7 +164,7 @@ namespace Off_brand_Minecraft
                 else playerPos[2] += distanceToStop[5];
             }
         }
-        public void PlayerPlaceBlock(ref short[,,] blocks, ref bool[,,] blockPowering)
+        public void PlayerPlaceBlock(ref short[,,] blocks, ref short[,,] destructionLevels, ref bool[,,] blockPowering)
         {
             if(heldBlock != 0) //placera block om spelaren håller i ett block
             {
@@ -184,6 +184,7 @@ namespace Off_brand_Minecraft
                     else
                     {
                         blocks[blockToPlace[0], blockToPlace[1], blockToPlace[2]] = hotBar[hotBarTarget, 0];
+                        destructionLevels[blockToPlace[0], blockToPlace[1], blockToPlace[2]] = 100;
                         hotBar[hotBarTarget, 1]--;
                         if (hotBar[hotBarTarget, 1] == 0) hotBar[hotBarTarget, 0] = 0;
                     }

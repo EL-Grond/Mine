@@ -566,7 +566,7 @@ namespace Off_brand_Minecraft
             }
             if (e.Button == MouseButtons.Left && pause) //sätt ut block
             {
-                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks, ref map[player.worldWithPlayer].blockPowering);
+                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks, ref map[player.worldWithPlayer].destructionLevels, ref map[player.worldWithPlayer].blockPowering);
                 player.RefreshHotBarAmountIndicatorValues();
             }
         }
