@@ -278,9 +278,32 @@ namespace Off_brand_Minecraft
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.C)
+            if(e.KeyCode == Keys.C && !player.inventoryIsOpen)
             {
-                player.PickUpDestroyedBlock(5);
+                int targetedBlockCode = 5;
+                bool playerCanAbsorbBlock = false; //bestäm om spelaren kan plocka upp det förstörda blocket
+                for (int i = 0; i < 10; i++)
+                {
+                    if (player.hotBar[i, 0] == 0 || (player.hotBar[i, 0] == targetedBlockCode && player.hotBar[i, 1] < 64)) //bestäm om den kan plockas upp i hotbaren
+                    {
+                        playerCanAbsorbBlock = true;
+                        break;
+                    }
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (player.inventory[i, j, 0] == 0 || (player.inventory[i, j, 0] == targetedBlockCode && player.inventory[i, j, 1] < 64)) //bestäm om den kan plockas upp i inventariet
+                        {
+                            playerCanAbsorbBlock = true;
+                            break;
+                        }
+                    }
+                    if (playerCanAbsorbBlock) break;
+                }
+                if (playerCanAbsorbBlock)
+                {
+                    player.PickUpDestroyedBlock(5);
+                    player.RefreshHotBarAmountIndicatorValues();
+                }
             }
             if (e.KeyCode == Keys.Left)
                 try 
