@@ -28,159 +28,149 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.tickSpeed = new System.Windows.Forms.Timer(this.components);
-            this.lblPlayerAngle = new System.Windows.Forms.Label();
-            this.lblPickedBlockAmountIndicator = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.pbxLogo = new System.Windows.Forms.PictureBox();
-            this.btnChange = new System.Windows.Forms.Button();
-            this.lbxControls = new System.Windows.Forms.ListBox();
-            this.btnControls = new System.Windows.Forms.Button();
-            this.cbxInvertY = new System.Windows.Forms.CheckBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pbxLogo)).BeginInit();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            tickSpeed = new System.Windows.Forms.Timer(components);
+            lblPlayerAngle = new Label();
+            lblPickedBlockAmountIndicator = new Label();
+            button1 = new Button();
+            pbxLogo = new PictureBox();
+            btnChange = new Button();
+            lbxControls = new ListBox();
+            btnControls = new Button();
+            cbxInvertY = new CheckBox();
+            lightupdates = new System.Windows.Forms.Timer(components);
+            ((System.ComponentModel.ISupportInitialize)pbxLogo).BeginInit();
+            SuspendLayout();
             // 
             // tickSpeed
             // 
-            this.tickSpeed.Interval = 1;
-            this.tickSpeed.Tick += new System.EventHandler(this.tickSpeed_Tick);
+            tickSpeed.Interval = 10;
+            tickSpeed.Tick += tickSpeed_Tick;
             // 
             // lblPlayerAngle
             // 
-            this.lblPlayerAngle.AutoSize = true;
-            this.lblPlayerAngle.Location = new System.Drawing.Point(0, 0);
-            this.lblPlayerAngle.Name = "lblPlayerAngle";
-            this.lblPlayerAngle.Size = new System.Drawing.Size(0, 25);
-            this.lblPlayerAngle.TabIndex = 0;
+            lblPlayerAngle.AutoSize = true;
+            lblPlayerAngle.Location = new Point(0, 0);
+            lblPlayerAngle.Name = "lblPlayerAngle";
+            lblPlayerAngle.Size = new Size(0, 25);
+            lblPlayerAngle.TabIndex = 0;
             // 
             // lblPickedBlockAmountIndicator
             // 
-            this.lblPickedBlockAmountIndicator.AutoSize = true;
-            this.lblPickedBlockAmountIndicator.Location = new System.Drawing.Point(585, 95);
-            this.lblPickedBlockAmountIndicator.Name = "lblPickedBlockAmountIndicator";
-            this.lblPickedBlockAmountIndicator.Size = new System.Drawing.Size(0, 25);
-            this.lblPickedBlockAmountIndicator.TabIndex = 1;
+            lblPickedBlockAmountIndicator.AutoSize = true;
+            lblPickedBlockAmountIndicator.Location = new Point(585, 95);
+            lblPickedBlockAmountIndicator.Name = "lblPickedBlockAmountIndicator";
+            lblPickedBlockAmountIndicator.Size = new Size(0, 25);
+            lblPickedBlockAmountIndicator.TabIndex = 1;
             // 
             // button1
             // 
-            this.button1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Swis721 Blk BT", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button1.Location = new System.Drawing.Point(52, 95);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(324, 61);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Save and exit";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            button1.BackColor = SystemColors.ActiveCaption;
+            button1.BackgroundImageLayout = ImageLayout.Zoom;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.Font = new Font("Swis721 Blk BT", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            button1.Location = new Point(52, 95);
+            button1.Name = "button1";
+            button1.Size = new Size(324, 61);
+            button1.TabIndex = 2;
+            button1.Text = "Save and exit";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
             // 
             // pbxLogo
             // 
-            this.pbxLogo.Image = global::Off_brand_Minecraft.Properties.Resources.Mine;
-            this.pbxLogo.Location = new System.Drawing.Point(382, 12);
-            this.pbxLogo.Name = "pbxLogo";
-            this.pbxLogo.Size = new System.Drawing.Size(391, 144);
-            this.pbxLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbxLogo.TabIndex = 3;
-            this.pbxLogo.TabStop = false;
+            pbxLogo.Image = Properties.Resources.Mine;
+            pbxLogo.Location = new Point(382, 12);
+            pbxLogo.Name = "pbxLogo";
+            pbxLogo.Size = new Size(391, 144);
+            pbxLogo.SizeMode = PictureBoxSizeMode.StretchImage;
+            pbxLogo.TabIndex = 3;
+            pbxLogo.TabStop = false;
             // 
             // btnChange
             // 
-            this.btnChange.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.btnChange.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnChange.Font = new System.Drawing.Font("Swis721 Blk BT", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnChange.Location = new System.Drawing.Point(52, 199);
-            this.btnChange.Name = "btnChange";
-            this.btnChange.Size = new System.Drawing.Size(324, 61);
-            this.btnChange.TabIndex = 4;
-            this.btnChange.Text = "Change background";
-            this.btnChange.UseVisualStyleBackColor = false;
-            this.btnChange.Click += new System.EventHandler(this.btnChange_Click);
+            btnChange.BackColor = SystemColors.ActiveCaption;
+            btnChange.BackgroundImageLayout = ImageLayout.Zoom;
+            btnChange.FlatStyle = FlatStyle.Flat;
+            btnChange.Font = new Font("Swis721 Blk BT", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            btnChange.Location = new Point(52, 199);
+            btnChange.Name = "btnChange";
+            btnChange.Size = new Size(324, 61);
+            btnChange.TabIndex = 4;
+            btnChange.Text = "Change background";
+            btnChange.UseVisualStyleBackColor = false;
+            btnChange.Click += btnChange_Click;
             // 
             // lbxControls
             // 
-            this.lbxControls.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.lbxControls.Font = new System.Drawing.Font("Swis721 Blk BT", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lbxControls.FormattingEnabled = true;
-            this.lbxControls.ItemHeight = 21;
-            this.lbxControls.Items.AddRange(new object[] {
-            "Controls:",
-            "W = Walk forwards",
-            "S = Walk backwards",
-            "A = Strafe left",
-            "D = Strafe right",
-            "Shift = Run",
-            "Space = Jump",
-            "G = toggle graphics quality",
-            "Right-Arrow = Decrease render distance",
-            "Left-Arrow = Increase render distance",
-            "E = Inventory",
-            "ESC = Pause/Exit menu/Close game from main menu",
-            "Right mouse button = destroy block / pick up half of the content in an inventory " +
-                "slot",
-            "Left mouse button = place block / pick up the content in an inventory slot"});
-            this.lbxControls.Location = new System.Drawing.Point(382, 187);
-            this.lbxControls.Name = "lbxControls";
-            this.lbxControls.Size = new System.Drawing.Size(857, 340);
-            this.lbxControls.TabIndex = 5;
+            lbxControls.BackColor = SystemColors.ActiveCaption;
+            lbxControls.Font = new Font("Swis721 Blk BT", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            lbxControls.FormattingEnabled = true;
+            lbxControls.ItemHeight = 21;
+            lbxControls.Items.AddRange(new object[] { "Controls:", "W = Walk forwards", "S = Walk backwards", "A = Strafe left", "D = Strafe right", "Shift = Run", "Space = Jump", "G = toggle graphics quality", "Right-Arrow = Decrease render distance", "Left-Arrow = Increase render distance", "E = Inventory", "ESC = Pause/Exit menu/Close game from main menu", "Right mouse button = destroy block / pick up half of the content in an inventory slot", "Left mouse button = place block / pick up the content in an inventory slot" });
+            lbxControls.Location = new Point(382, 187);
+            lbxControls.Name = "lbxControls";
+            lbxControls.Size = new Size(857, 340);
+            lbxControls.TabIndex = 5;
             // 
             // btnControls
             // 
-            this.btnControls.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.btnControls.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnControls.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnControls.Font = new System.Drawing.Font("Swis721 Blk BT", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnControls.Location = new System.Drawing.Point(52, 266);
-            this.btnControls.Name = "btnControls";
-            this.btnControls.Size = new System.Drawing.Size(324, 61);
-            this.btnControls.TabIndex = 6;
-            this.btnControls.Text = "Controls";
-            this.btnControls.UseVisualStyleBackColor = false;
-            this.btnControls.Click += new System.EventHandler(this.btnControls_Click);
+            btnControls.BackColor = SystemColors.ActiveCaption;
+            btnControls.BackgroundImageLayout = ImageLayout.Zoom;
+            btnControls.FlatStyle = FlatStyle.Flat;
+            btnControls.Font = new Font("Swis721 Blk BT", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            btnControls.Location = new Point(52, 266);
+            btnControls.Name = "btnControls";
+            btnControls.Size = new Size(324, 61);
+            btnControls.TabIndex = 6;
+            btnControls.Text = "Controls";
+            btnControls.UseVisualStyleBackColor = false;
+            btnControls.Click += btnControls_Click;
             // 
             // cbxInvertY
             // 
-            this.cbxInvertY.AutoSize = true;
-            this.cbxInvertY.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.cbxInvertY.Location = new System.Drawing.Point(622, 231);
-            this.cbxInvertY.Name = "cbxInvertY";
-            this.cbxInvertY.Size = new System.Drawing.Size(134, 29);
-            this.cbxInvertY.TabIndex = 7;
-            this.cbxInvertY.Text = "Invert Y-axis";
-            this.cbxInvertY.UseVisualStyleBackColor = false;
+            cbxInvertY.AutoSize = true;
+            cbxInvertY.BackColor = SystemColors.ActiveCaption;
+            cbxInvertY.Location = new Point(622, 231);
+            cbxInvertY.Name = "cbxInvertY";
+            cbxInvertY.Size = new Size(134, 29);
+            cbxInvertY.TabIndex = 7;
+            cbxInvertY.Text = "Invert Y-axis";
+            cbxInvertY.UseVisualStyleBackColor = false;
+            // 
+            // lightupdates
+            // 
+            lightupdates.Interval = 1000;
+            lightupdates.Tick += lightupdates_Tick;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DeepSkyBlue;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.cbxInvertY);
-            this.Controls.Add(this.btnControls);
-            this.Controls.Add(this.lbxControls);
-            this.Controls.Add(this.btnChange);
-            this.Controls.Add(this.pbxLogo);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.lblPickedBlockAmountIndicator);
-            this.Controls.Add(this.lblPlayerAngle);
-            this.DoubleBuffered = true;
-            this.KeyPreview = true;
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.Shown += new System.EventHandler(this.LoadMenu);
-            this.Click += new System.EventHandler(this.tickSpeed_Tick);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseClick);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
-            ((System.ComponentModel.ISupportInitialize)(this.pbxLogo)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.DeepSkyBlue;
+            ClientSize = new Size(800, 450);
+            Controls.Add(cbxInvertY);
+            Controls.Add(btnControls);
+            Controls.Add(lbxControls);
+            Controls.Add(btnChange);
+            Controls.Add(pbxLogo);
+            Controls.Add(button1);
+            Controls.Add(lblPickedBlockAmountIndicator);
+            Controls.Add(lblPlayerAngle);
+            DoubleBuffered = true;
+            KeyPreview = true;
+            Name = "Form1";
+            Text = "Form1";
+            Shown += LoadMenu;
+            Click += tickSpeed_Tick;
+            KeyDown += KeyDownEvent;
+            KeyUp += Form1_KeyUp;
+            MouseClick += Form1_MouseClick;
+            MouseDown += Form1_MouseDown;
+            MouseUp += Form1_MouseUp;
+            ((System.ComponentModel.ISupportInitialize)pbxLogo).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -194,5 +184,6 @@
         private ListBox lbxControls;
         private Button btnControls;
         private CheckBox cbxInvertY;
+        private System.Windows.Forms.Timer lightupdates;
     }
 }

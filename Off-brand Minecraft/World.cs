@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Off_brand_Minecraft
 {
@@ -14,10 +15,15 @@ namespace Off_brand_Minecraft
         public short[,,]? blocks;
         public short[,,]? destructionLevels;
         public bool[,,]? blockPowering;
+        public short[,,]? lightLevels;
+        public bool[,,]? blocksExposedToSunlight;
+        public bool[,,]? blockIsExposed;
+        public bool[,,]? blockIsLightUpdated;
+        public short[,,] rgbValues = new short[8, 15, 3];
         public bool[,] blockConductivity = { { false, false }, { true, false }, { true, false }, { true, false }, { true, false }, { true, true }, { true, false }, { true, false }, { false, false } };
         short[] destructionSpeeds = { 0, 0, 5, 15, 15, 15, 10, 25 };
         readonly Random r = new();
-        public SolidBrush[] brushes = new SolidBrush[8];
+        public SolidBrush[,] brushes = new SolidBrush[8,15];
         public static float[,] Rref(float[,] Matrix)
         {
             if (Matrix[0,0] == 0) //element (0,0) får inte vara 0, därför flyttas raderna för att sätta en rad där element 1 != 0
@@ -161,19 +167,56 @@ namespace Off_brand_Minecraft
             }
             return noiseMap;
         }
-        public void GenerateWorld(ref double[] pos, ref SolidBrush[] brushes, int[] worldSize, int maxGrid)
+        public void GenerateWorld(ref double[] pos, ref SolidBrush[,] brushes, int[] worldSize, int maxGrid, bool menu)
         {
             worldDimensions = worldSize;
             blocks = new short[worldSize[0], worldSize[1], worldSize[2]]; //en array av alla blockoder för att se vilket block som befinner sig på varje koordinat
             destructionLevels = new short[worldSize[0], worldSize[1], worldSize[2]]; //en array förstörelsenivåer för att lagra hur mycket hälsa varje block har
             blockPowering = new bool[worldSize[0], worldSize[1], worldSize[2]]; //en array som visar om ett block får kraft eller inte
-            brushes[1] = new SolidBrush(Color.Black); //färger för de olika blocken
+            lightLevels = new short[worldSize[0], worldSize[1], worldSize[2]]; //array för alla blocks ljusnivå
+            blocksExposedToSunlight = new bool[worldSize[0], worldSize[1], worldSize[2]];
+            blockIsExposed = new bool[worldSize[0], worldSize[1], worldSize[2]];
+            blockIsLightUpdated = new bool[worldSize[0], worldSize[1], worldSize[2]];
+            rgbValues[2, 14, 0] = 128;
+            rgbValues[2, 14, 1] = 128;
+            rgbValues[2, 14, 2] = 128; //grå
+            rgbValues[3, 14, 0] = 139;
+            rgbValues[3, 14, 1] = 69;
+            rgbValues[3, 14, 2] = 19; //brun
+            rgbValues[4, 14, 0] = 0;
+            rgbValues[4, 14, 1] = 160;
+            rgbValues[4, 14, 2] = 0; //grön
+            rgbValues[5, 14, 0] = 255;
+            rgbValues[5, 14, 1] = 255;
+            rgbValues[5, 14, 2] = 0; //ljusgrön
+            rgbValues[6, 14, 0] = 145;
+            rgbValues[6, 14, 1] = 82;
+            rgbValues[6, 14, 2] = 45;
+            rgbValues[7, 14, 0] = 124;
+            rgbValues[7, 14, 1] = 252;
+            rgbValues[7, 14, 2] = 0;
+            for(int i = 0; i < rgbValues.GetLength(0); i++)
+            {
+                brushes[i,14] = new SolidBrush(Color.FromArgb(rgbValues[i,14,0], rgbValues[i, 14, 1], rgbValues[i, 14, 2]));
+            }
+            for (int i = rgbValues.GetLength(1) - 1; i > 0; i--)
+            {
+                for(int j = 0; j < rgbValues.GetLength(0); j++)
+                {
+                    for(int k = 0; k < 3; k++)
+                    {
+                        rgbValues[j,i-1,k] = (short)(rgbValues[j,i,k] * 0.8);
+                    }
+                    brushes[j,i - 1] = new SolidBrush(Color.FromArgb(rgbValues[j,i - 1,0], rgbValues[j,i - 1,1], rgbValues[j,i - 1,2]));
+                }
+            }
+            /*brushes[1] = new SolidBrush(Color.Black); //färger för de olika blocken
             brushes[2] = new SolidBrush(Color.Gray);
             brushes[3] = new SolidBrush(Color.SaddleBrown);
             brushes[4] = new SolidBrush(Color.Green);
             brushes[5] = new SolidBrush(Color.Yellow);
             brushes[6] = new SolidBrush(Color.FromArgb(145,82,45));
-            brushes[7] = new SolidBrush(Color.LawnGreen);
+            brushes[7] = new SolidBrush(Color.FromArgb(124, 252, 0));*/
             pos[0] = worldSize[0] * 15;
             pos[2] = worldSize[2] * 15;
             float[,] altitudeMap = PerlinNoiseMap(worldSize,maxGrid, 2); //världens höjd
@@ -194,6 +237,8 @@ namespace Off_brand_Minecraft
                     for (int k = 0; k < blocks.GetLength(2); k++)
                     {
                         destructionLevels[i, j, k] = 100;
+                        lightLevels[i, j, k] = 0;
+                        if (menu) lightLevels[i, j, k] = 14;
                         if (j < (int)(altitudeMap[i, k] * 100f) + 25)
                         {
                             blocks[i, j, k] = 3;
@@ -249,6 +294,22 @@ namespace Off_brand_Minecraft
                 }
             }
             pos[1] = heightAtSpawn;
+            for(int i = 0; i < blocks.GetLength(0); i++)
+            {
+                for(int j = 40; j < blocks.GetLength(1); j++)
+                {
+                    for(int k = 0; k < blocks.GetLength(2); k++)
+                    {
+                        if(i > 0 && i < blocks.GetLength(0) - 1 && j > 0 && j < blocks.GetLength(1) - 1 && k > 0 && k < blocks.GetLength(2) - 1)
+                        {
+                            if (blocks[i, j, k] != 0 && (blocks[i + 1, j, k] == 0 || blocks[i - 1, j, k] == 0 || blocks[i, j + 1, k] == 0 || blocks[i, j - 1, k] == 0 || blocks[i, j, k + 1] == 0 || blocks[i, j, k - 1] == 0)) ;
+                            {
+                                blockIsExposed[i, j, k] = true;
+                            }
+                        }
+                    }
+                }
+            }
         }
         public void GenerateOak(ref short[,,] world, int[] baseblock)
         {
@@ -296,8 +357,8 @@ namespace Off_brand_Minecraft
                 }
             }
         }
-        public void Draw3DWorld(Graphics g, short[,,] blocks, bool[,,] blockPowering, double[] pos, double[] playerPerspective, Size screen, SolidBrush[] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize, bool worldIsMenu)
-        {
+        public void Draw3DWorld(Graphics g, short[,,] blocks, bool[,,] blockPowering, double[] pos, double[] playerPerspective, Size screen, SolidBrush[,] brushes, int renderDistance, ref int[] targetedSurface, bool goodGraphics, int[] worldSize, bool worldIsMenu)
+        {           
             Point screenCenter = new Point();
             screenCenter.X = screen.Width / 2;
             screenCenter.Y = screen.Height / 2;
@@ -309,6 +370,7 @@ namespace Off_brand_Minecraft
             int[] order = new int[6];
             int x, y, z; //relativa koordinater för blocket till spelaren
             Point[] targetedPoints = new Point[4];
+ 
             for (int i = 0; i < renderDistance; i++)
             {
                 y = i;
@@ -437,6 +499,7 @@ namespace Off_brand_Minecraft
                         if (Coords[0] < 0 || Coords[1] < 0 || Coords[2] < 0 ||
                             Coords[0] >= worldSize[0] || Coords[1] >= worldSize[1] || Coords[2] >= worldSize[2]) continue; //om blocket i någon axel befinner sig utanför världen
                         if (blocks[Coords[0], Coords[1], Coords[2]] == 0) continue; //om blocket är luft
+                        if (Math.Sqrt(Math.Pow(playerPos[0]/30 - Coords[0], 2) + Math.Pow(playerPos[1]/30 - Coords[1], 2) + Math.Pow(playerPos[2]/30 - Coords[2], 2)) > renderDistance / 2) continue; //om blocket är utanför det renderade klotet
                         if (Coords[0] == worldSize[0] - 1)
                         {
                             visibleSides[0] = true;  //om blocket är i den yttre kanten av världen
@@ -531,7 +594,7 @@ namespace Off_brand_Minecraft
                                         ChooseOffsets(ref relativePoints, offsets5, Coords, playerPos);
                                         break;
                                 }
-                                if (Math.Sqrt(Math.Pow(relativePoints[0, 0], 2) + Math.Pow(relativePoints[0, 0], 2) + Math.Pow(relativePoints[0, 0], 2)) <= 30)
+                                if (Math.Sqrt(Math.Pow(relativePoints[0, 0], 2) + Math.Pow(relativePoints[0, 1], 2) + Math.Pow(relativePoints[0, 2], 2)) >= renderDistance * 30)
                                 {
                                 }
                                 float[,] squarePoints = new float[4, 3];
@@ -664,7 +727,7 @@ namespace Off_brand_Minecraft
                                         {
                                             try
                                             {
-                                                g.FillPolygon(brushes[4], screenPoints);
+                                                g.FillPolygon(brushes[4,lightLevels[Coords[0], Coords[1], Coords[2]]], screenPoints);
                                                 if(goodGraphics) 
                                                     g.DrawPolygon(borderPen, screenPoints);
                                             }
@@ -674,7 +737,7 @@ namespace Off_brand_Minecraft
                                         {
                                             try
                                             {
-                                                g.FillPolygon(brushes[3], screenPoints);
+                                                g.FillPolygon(brushes[3, lightLevels[Coords[0], Coords[1], Coords[2]]], screenPoints);
                                                 if (goodGraphics) 
                                                     g.DrawPolygon(borderPen, screenPoints);
                                             }
@@ -685,7 +748,7 @@ namespace Off_brand_Minecraft
                                     {
                                         try
                                         {
-                                            g.FillPolygon(brushes[blocks[Coords[0], Coords[1], Coords[2]]], screenPoints);
+                                            g.FillPolygon(brushes[blocks[Coords[0], Coords[1], Coords[2]], lightLevels[Coords[0], Coords[1], Coords[2]]], screenPoints);
                                             if (goodGraphics)
                                                 g.DrawPolygon(borderPen, screenPoints);
                                         }
@@ -698,6 +761,13 @@ namespace Off_brand_Minecraft
                 }
             }
             if(targetExists && !worldIsMenu) g.DrawPolygon(Pens.Red, targetedPoints); //markerar den valda ytan på det valda blocket om världen inte är menyvärlden
+            /*for (int i = 0; i < brushes.GetLength(0); i++)
+            {
+                for (int j = 0; j < brushes.GetLength(1); j++)
+                {
+                    g.FillRectangle(brushes[i, j], i * 160 + j * 10, 0, 8, 10);
+                }
+            }*/
         }
         private void ChooseOffsets(ref int[,] relativePoints, int[] offsets, int[] Coords, int[] playerPos)
         {
@@ -716,9 +786,90 @@ namespace Off_brand_Minecraft
                 destructionLevels[targetedSurface[0], targetedSurface[1], targetedSurface[2]] -= destructionSpeeds[blocks[targetedSurface[0], targetedSurface[1], targetedSurface[2]]];
                 if (destructionLevels[targetedSurface[0], targetedSurface[1], targetedSurface[2]] <= 0)
                 {
+                    for (int i = 1; i <= 14; i++) //block i närheten av förändringen uppdarterar sin ljusstyrka
+                    {
+                        for (int dx = -i; dx <= i; dx++)
+                        {
+                            for (int dy = Math.Abs(dx) - i; dy <= i - Math.Abs(dx); dy++)
+                            {
+                                int dz = i - Math.Abs(dx) - Math.Abs(dy);
+                                try
+                                {
+                                    blockIsLightUpdated[targetedSurface[0] + dx, targetedSurface[1] + dy, targetedSurface[2] + dz] = false;
+                                    blockIsLightUpdated[targetedSurface[0] + dx, targetedSurface[1] + dy, targetedSurface[2] - dz] = false;
+                                }
+                                catch { }
+                            }
+                        }
+                    }
                     blockDestruction = true;
                 }
             }
+        }
+        public void DetermineBlockExposureLevel(ref bool[,,] blocksExposedToSunlight, short[,,] blocks, int x, int z)
+        {
+            for(int i = blocks.GetLength(1) - 1; i >= 0; i--) //bestämma om ett block är i direkt solljus
+            {
+                if (blocks[x, i, z] != 0)
+                {
+                    blocksExposedToSunlight[x, i, z] = true;
+                    break;
+                }
+            }
+        }
+
+        public void DetermineLightLevel(ref short[,,] lightLevels, short[,,] blocks, int x, int y, int z, bool[,,] blocksExposedToSunlight)
+        {
+            if (blocksExposedToSunlight[x, y, z]) //om blocket är direkt under solljus
+            {
+                bool[,] blockedRays = new bool[3,29];
+                blockIsLightUpdated[x, y, z] = true;
+                lightLevels[x, y, z] = 14;
+                for(int i = 1; i <= 14; i++) //gör en spridning av ljus från en punkt baserad på taxicab-avstånd 
+                {
+                    for(int dx = -i; dx <= i; dx++)
+                    {
+                        for(int dy = Math.Abs(dx) - i; dy <= i - Math.Abs(dx); dy++)
+                        {                           
+                            int dz = i - Math.Abs(dx) - Math.Abs(dy);
+                            try
+                            {
+                                if (lightLevels[x + dx, y + dy, z + dz] < 14 - i && blocks[x + dx, y + dy, z + dz] != 0) //positiv dz
+                                {
+                                    if (blocksExposedToSunlight[x + dx, y + dy, z + dz] || blockedRays[0, dx + 14] || blockedRays[1, dy + 14] || blockedRays[2, dz + 14] || (blocks[x + dx + 1, y + dy, z + dz] != 0 && blocks[x + dx - 1, y + dy, z + dz] != 0 && blocks[x + dx, y + dy + 1, z + dz] != 0 && blocks[x + dx, y + dy - 1, z + dz] != 0 && blocks[x + dx, y + dy, z + dz + 1] != 0 && blocks[x + dx, y + dy, z + dz - 1] != 0))
+                                    {
+                                        //undviker block som är utsatta för solljus, block som är skuggade av andra block och block som inte har någon öppen yta
+                                    }
+                                    else
+                                    {
+                                        lightLevels[x + dx, y + dy, z + dz] = (short)(14 - i); //ljusstyrkan baseras på avståndet från ljuskällan
+                                        blockedRays[0, dx + 14] = true;
+                                        blockedRays[1, dy + 14] = true;
+                                        blockedRays[2, dz + 14] = true;
+                                    }
+
+                                }
+                                if (lightLevels[x + dx, y + dy, z - dz] < 14 - i && blocks[x + dx, y + dy, z - dz] != 0)  //negativ dz
+                                {
+                                    if (blocksExposedToSunlight[x + dx, y + dy, z - dz] || blockedRays[0, dx + 14] || blockedRays[1, dy + 14] || blockedRays[2, 14 - dz] || (blocks[x + dx + 1, y + dy, z - dz] != 0 && blocks[x + dx - 1, y + dy, z - dz] != 0 && blocks[x + dx, y + dy + 1, z - dz] != 0 && blocks[x + dx, y + dy - 1, z - dz] != 0 && blocks[x + dx, y + dy, z - dz + 1] != 0 && blocks[x + dx, y + dy, z - dz - 1] != 0))
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        lightLevels[x + dx, y + dy, z - dz] = (short)(14 - i);
+                                        blockedRays[0, dx + 14] = true;
+                                        blockedRays[1, dy + 14] = true;
+                                        blockedRays[2, 14 - dz] = true;
+                                    }
+                                }
+                            }
+                            catch { };
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

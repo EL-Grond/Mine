@@ -164,14 +164,14 @@ namespace Off_brand_Minecraft
                 else playerPos[2] += distanceToStop[5];
             }
         }
-        public void PlayerPlaceBlock(ref short[,,] blocks, ref short[,,] destructionLevels, ref bool[,,] blockPowering)
+        public void PlayerPlaceBlock(ref short[,,] blocks, ref short[,,] destructionLevels, ref bool[,,] blockPowering, ref bool[,,] blockIsLightUpdated, bool targetExists)
         {
-            if(heldBlock != 0) //placera block om spelaren håller i ett block
-            {
+            if(heldBlock != 0 && targetExists) //placera block om spelaren håller i ett block
+            { 
                 try
                 {
                     int[] blockToPlace = new int[3];
-                    for (int i = 0; i < 3; i++) //bestäm var blocket ska plaveras
+                    for (int i = 0; i < 3; i++) //bestäm var blocket ska placeras
                     {
                         if (targetedSurface[3] == 2 * i) blockToPlace[i] = targetedSurface[i] + 1;
                         else if (targetedSurface[3] == 2 * i + 1) blockToPlace[i] = targetedSurface[i] - 1;
@@ -184,6 +184,22 @@ namespace Off_brand_Minecraft
                     else
                     {
                         blocks[blockToPlace[0], blockToPlace[1], blockToPlace[2]] = hotBar[hotBarTarget, 0];
+                        for (int i = 1; i <= 14; i++) //block i närheten av förändringen uppdarterar sin ljusstyrka
+                        {
+                            for (int dx = -i; dx <= i; dx++)
+                            {
+                                for (int dy = Math.Abs(dx) - i; dy <= i - Math.Abs(dx); dy++)
+                                {
+                                    int dz = i - Math.Abs(dx) - Math.Abs(dy);
+                                    try
+                                    {
+                                        blockIsLightUpdated[targetedSurface[0] + dx, targetedSurface[1] + dy, targetedSurface[2] + dz] = false;
+                                        blockIsLightUpdated[targetedSurface[0] + dx, targetedSurface[1] + dy, targetedSurface[2] - dz] = false;
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
                         destructionLevels[blockToPlace[0], blockToPlace[1], blockToPlace[2]] = 100;
                         hotBar[hotBarTarget, 1]--;
                         if (hotBar[hotBarTarget, 1] == 0) hotBar[hotBarTarget, 0] = 0;

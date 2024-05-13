@@ -21,6 +21,7 @@ namespace Off_brand_Minecraft
         {
             InitializeComponent();
             tickSpeed.Start();
+            lightupdates.Start();
             this.FormBorderStyle = FormBorderStyle.None;
             this.Bounds = Screen.PrimaryScreen.Bounds;
             button1.Visible = false; //kontrollbeskrivning
@@ -30,7 +31,7 @@ namespace Off_brand_Minecraft
             cbxInvertY.Visible = false;
             cbxInvertY.Enabled = false;
             lblPickedBlockAmountIndicator.BackColor = Color.DarkGray;
-            for(int i = 0; i < worldMenu.Length; i++) //menyn av världar genereras
+            for (int i = 0; i < worldMenu.Length; i++) //menyn av världar genereras
             {
                 worldMenu[i] = new Button();
                 worldMenu[i].AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -51,7 +52,7 @@ namespace Off_brand_Minecraft
 
         }
         //sessionens världar
-        readonly World[] map = { new World() , new World(), new World(), new World(), new World(), new World(), new World(), new World() };
+        readonly World[] map = { new World(), new World(), new World(), new World(), new World(), new World(), new World(), new World() };
         double[,] savedPositions = new double[9, 3];
         short[,,,] savedInventories = new short[8, 10, 3, 2];
         short[,,] savedHotBars = new short[8, 10, 2];
@@ -98,7 +99,7 @@ namespace Off_brand_Minecraft
                     }
                     else lblPickedBlockAmountIndicator.Visible = false;
                 }
-                if(pause || player.inventoryIsOpen) //gravitation och fysik sker även om spelaren är i inventariet
+                if (pause || player.inventoryIsOpen) //gravitation och fysik sker även om spelaren är i inventariet
                 {
                     player.CheckCollisions(ref player.possibleDirections, map[player.worldWithPlayer].blocks, player.playerPos, player.hitBox, ref player.distanceToStop); //räkna alla kollisioner för spelarens alla riktningar
                     if (player.possibleDirections[3]) //om utrymmet under spelaren är fritt
@@ -137,7 +138,7 @@ namespace Off_brand_Minecraft
                             }
                             if (playerCanAbsorbBlock) break;
                         }
-                        if(playerCanAbsorbBlock) map[player.worldWithPlayer].DestroyBlock(player.targetedSurface, ref blockDestruction);
+                        if (playerCanAbsorbBlock) map[player.worldWithPlayer].DestroyBlock(player.targetedSurface, ref blockDestruction);
                     }
                     if (blockDestruction)
                     {
@@ -181,7 +182,7 @@ namespace Off_brand_Minecraft
                         {
                             player.playerPerspective[0] += 0.0001;
                         }
-                        if(cbxInvertY.Checked) player.playerPerspective[1] = Cursor.Position.Y * Math.PI / this.Size.Height - Math.PI / 2 + 0.01; //invertera Y
+                        if (cbxInvertY.Checked) player.playerPerspective[1] = Cursor.Position.Y * Math.PI / this.Size.Height - Math.PI / 2 + 0.01; //invertera Y
                         else player.playerPerspective[1] = (this.Height - Cursor.Position.Y) * Math.PI / this.Size.Height - Math.PI / 2 + 0.01;
                         if (player.playerPerspective[1] % (Math.PI / 2) == 0)
                         {
@@ -191,7 +192,7 @@ namespace Off_brand_Minecraft
                 }
                 draw = true;
                 Invalidate();
-            }            
+            }
         }
 
         private void WorldInitiation(object sender, EventArgs e)
@@ -214,11 +215,11 @@ namespace Off_brand_Minecraft
             pbxLogo.Visible = false;
             mainMenu = false;
             Button btn = (Button)sender;
-            int[] worldSize = { 2049, 256, 2049 }; //bestäm världens storlek
+            int[] worldSize = { 1025, 256, 1025 }; //bestäm världens storlek
             player.worldWithPlayer = (short)int.Parse((string)btn.Tag);
             if (map[player.worldWithPlayer].blocks == null)
             {
-                map[player.worldWithPlayer].GenerateWorld(ref player.playerPos, ref map[player.worldWithPlayer].brushes, worldSize, 8); //skapa världen
+                map[player.worldWithPlayer].GenerateWorld(ref player.playerPos, ref map[player.worldWithPlayer].brushes, worldSize, 7, false); //skapa världen
                 player.playerPos[1] += 90;
                 btn.Text = "Enter world " + (player.worldWithPlayer + 1); //indikera att en värld existerar på den här platsen
                 for (int i = 0; i < 3; i++)
@@ -244,19 +245,19 @@ namespace Off_brand_Minecraft
                 for (int i = 0; i < 3; i++)
                 {
                     player.playerPos[i] = savedPositions[player.worldWithPlayer, i]; //spelaren skickas till senast besökta koordinat
-                    for(int j = 0; j < 10; j++)
+                    for (int j = 0; j < 10; j++)
                     {
-                        for(int k = 0; k < 2; k++)
+                        for (int k = 0; k < 2; k++)
                         {
                             player.inventory[j, i, k] = savedInventories[player.worldWithPlayer, j, i, k]; //spelarens inventarie återställs
                         }
                     }
                 }
-                for(int i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
-                    for(int j = 0; j < 2; j++)
+                    for (int j = 0; j < 2; j++)
                     {
-                        player.hotBar[i,j] = savedHotBars[player.worldWithPlayer, i, j]; //spelarens hotbar återställs
+                        player.hotBar[i, j] = savedHotBars[player.worldWithPlayer, i, j]; //spelarens hotbar återställs
                     }
                 }
             }
@@ -278,7 +279,7 @@ namespace Off_brand_Minecraft
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.C && !player.inventoryIsOpen)
+            if (e.KeyCode == Keys.C && !player.inventoryIsOpen)
             {
                 int targetedBlockCode = 5;
                 bool playerCanAbsorbBlock = false; //bestäm om spelaren kan plocka upp det förstörda blocket
@@ -306,22 +307,22 @@ namespace Off_brand_Minecraft
                 }
             }
             if (e.KeyCode == Keys.Left)
-                try 
-                { 
-                    renderDistance++; 
+                try
+                {
+                    renderDistance++;
                 }
                 catch { }
-            if (e.KeyCode == Keys.Right) 
-                try 
-                { 
-                    renderDistance--; 
+            if (e.KeyCode == Keys.Right)
+                try
+                {
+                    renderDistance--;
                 }
                 catch { }
             if (e.KeyCode == Keys.G)
             {
                 goodGraphics = !goodGraphics; //toggla bra grafik
             }
-            if(e.KeyCode == Keys.Escape) //stäng spelet eller öppna spelmenyn
+            if (e.KeyCode == Keys.Escape) //stäng spelet eller öppna spelmenyn
             {
                 btnControls.Text = "Controls";
                 lbxControls.Visible = false;
@@ -385,9 +386,9 @@ namespace Off_brand_Minecraft
                         }
                     }
                 }
-                
+
             }
-            if(e.KeyCode == Keys.W && pause) //framåt
+            if (e.KeyCode == Keys.W && pause) //framåt
             {
                 player.controlInputs[0] = true;
             }
@@ -451,7 +452,7 @@ namespace Off_brand_Minecraft
             {
                 player.hotBarTarget = 9;
             }
-            if(e.KeyCode == Keys.E && !gameMenu) //öppna inventory
+            if (e.KeyCode == Keys.E && !gameMenu) //öppna inventory
             {
                 player.inventoryIsOpen = !player.inventoryIsOpen;
                 if (player.inventoryIsOpen)
@@ -466,19 +467,19 @@ namespace Off_brand_Minecraft
                     if (player.pickedUpBlock[1] > 0) //lägg ifrån spelaren blocket den höll i
                     {
                         bool blockAbsorbed = false;
-                        for(int i = 0; i < 10; i++)
+                        for (int i = 0; i < 10; i++)
                         {
                             if (blockAbsorbed) break;
-                            if (player.hotBar[i,1] == 0)
+                            if (player.hotBar[i, 1] == 0)
                             {
-                                for (int k = 0; k < 2; k++) 
+                                for (int k = 0; k < 2; k++)
                                 {
                                     player.hotBar[i, k] = player.pickedUpBlock[k];
                                     player.pickedUpBlock[k] = 0;
                                 }
                                 break;
                             }
-                            for(int j = 0; j < 3; j++)
+                            for (int j = 0; j < 3; j++)
                             {
                                 if (player.inventory[i, j, 1] == 0)
                                 {
@@ -501,7 +502,7 @@ namespace Off_brand_Minecraft
                 }
             }
         }
-        
+
         protected override void OnPaint(PaintEventArgs e)
         {
             if (draw && !mainMenu) //rita värld och spelarens gränssnitt
@@ -525,9 +526,9 @@ namespace Off_brand_Minecraft
             //avlsuta tidigare rörelser
             if (e.KeyCode == Keys.W)
             {
-                player.controlInputs[0] = false; 
+                player.controlInputs[0] = false;
             }
-            if (e.KeyCode == Keys.A) 
+            if (e.KeyCode == Keys.A)
             {
                 player.controlInputs[3] = false;
             }
@@ -566,7 +567,7 @@ namespace Off_brand_Minecraft
             }
             if (e.Button == MouseButtons.Left && pause) //sätt ut block
             {
-                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks, ref map[player.worldWithPlayer].destructionLevels, ref map[player.worldWithPlayer].blockPowering);
+                player.PlayerPlaceBlock(ref map[player.worldWithPlayer].blocks, ref map[player.worldWithPlayer].destructionLevels, ref map[player.worldWithPlayer].blockPowering, ref map[player.worldWithPlayer].blockIsLightUpdated, map[player.worldWithPlayer].targetExists);
                 player.RefreshHotBarAmountIndicatorValues();
             }
         }
@@ -580,7 +581,7 @@ namespace Off_brand_Minecraft
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            lblPlayerAngle.Visible = false; 
+            lblPlayerAngle.Visible = false;
             player.HideHotBarAmountIndicators();
             for (int i = 0; i < 3; i++)
             {
@@ -605,7 +606,7 @@ namespace Off_brand_Minecraft
             button1.Enabled = false;
             for (int i = 0; i < 3; i++) player.playerPos[i] = savedPositions[8, i]; //spelaren går till huvudmenyn
             mainMenu = true;
-            for (int i = 0; i < 8; i++) 
+            for (int i = 0; i < 8; i++)
             {
                 worldMenu[i].Visible = true;
                 worldMenu[i].Enabled = true;
@@ -621,11 +622,11 @@ namespace Off_brand_Minecraft
         {
             button1.Location = new Point(this.Size.Width / 2 - button1.Width / 2, this.Size.Height / 2 - button1.Height / 2);
             pbxLogo.Location = new Point(this.Size.Width / 2 - pbxLogo.Width / 2, this.Size.Height / 7);
-            menu.GenerateWorld(ref player.playerPos, ref menu.brushes, menuSize, 7);
+            menu.GenerateWorld(ref player.playerPos, ref menu.brushes, menuSize, 7, true);
             player.playerPos[1] += 300;
             if (!pause)
             {
-                for(int i = 0; i < 3; i++) savedPositions[8,i] = player.playerPos[i];
+                for (int i = 0; i < 3; i++) savedPositions[8, i] = player.playerPos[i];
             }
             mainMenu = true;
             player.playerPerspective[1] = -0.5;
@@ -633,7 +634,7 @@ namespace Off_brand_Minecraft
 
         private void btnChange_Click(object sender, EventArgs e) //bakgrunden byts
         {
-            menu.GenerateWorld(ref player.playerPos, ref menu.brushes, menuSize, 7);
+            menu.GenerateWorld(ref player.playerPos, ref menu.brushes, menuSize, 7, true);
             player.playerPos[1] += 300;
         }
 
@@ -664,6 +665,63 @@ namespace Off_brand_Minecraft
                     }
                 }
                 btnControls.Text = "Controls";
+            }
+        }
+
+        private void lightupdates_Tick(object sender, EventArgs e)
+        {
+            if (player.playerIsInWorld)
+            {
+                for (int i = (int)(player.playerPos[0] / 30 - 30); i < (int)(player.playerPos[0] / 30 + 30); i++)
+                {
+                    for (int j = (int)(player.playerPos[2] / 30 - 30); j < (int)(player.playerPos[2] / 30 + 30); j++)
+                    {
+                        map[player.worldWithPlayer].DetermineBlockExposureLevel(ref map[player.worldWithPlayer].blocksExposedToSunlight, map[player.worldWithPlayer].blocks, i, j);
+                    }
+                }
+                for (int i = (int)(player.playerPos[0] / 30 - 30); i < (int)(player.playerPos[0] / 30 + 30); i++)
+                {
+                    for (int j = (int)(player.playerPos[1] / 30 - 20); j < (int)(player.playerPos[1] / 30 + 20); j++)
+                    {
+                        for (int k = (int)(player.playerPos[2] / 30 - 30); k < (int)(player.playerPos[2] / 30 + 30); k++)
+                        {
+                            if (Math.Abs(i - (int)(player.playerPos[0] / 30)) < 15 && Math.Abs(j - (int)(player.playerPos[1] / 30)) < 15 && Math.Abs(k - (int)(player.playerPos[2] / 30)) < 15)
+                            {
+                                if (map[player.worldWithPlayer].blocks[i, j, k] != 0 && map[player.worldWithPlayer].lightLevels[i, j, k] < 13 && map[player.worldWithPlayer].blockIsExposed[i, j, k])
+                                {
+                                    if (Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i + 1, j, k]) > 1 ||
+                                    Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i - 1, j, k]) > 1 ||
+                                    Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i, j + 1, k]) > 1 ||
+                                    Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i, j - 1, k]) > 1 ||
+                                    Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i, j, k + 1]) > 1 ||
+                                    Math.Abs(map[player.worldWithPlayer].lightLevels[i, j, k] - map[player.worldWithPlayer].lightLevels[i, j, k - 1]) > 1)
+                                    {
+                                        for (int l = 1; l <= 4; l++)
+                                        {
+                                            for (int dx = -l; dx <= l; dx++)
+                                            {
+                                                for (int dy = Math.Abs(dx) - l; dy <= l - Math.Abs(dx); dy++)
+                                                {
+                                                    int dz = l - Math.Abs(dx) - Math.Abs(dy);
+                                                    try
+                                                    {
+                                                        map[player.worldWithPlayer].blockIsLightUpdated[i + dx, j + dy, k + dz] = false;
+                                                        map[player.worldWithPlayer].blockIsLightUpdated[i + dx, j + dy, k - dz] = false;
+                                                    }
+                                                    catch { }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (map[player.worldWithPlayer].blocks[i, j, k] != 0 && !map[player.worldWithPlayer].blockIsLightUpdated[i, j, k]) 
+                            {
+                                map[player.worldWithPlayer].DetermineLightLevel(ref map[player.worldWithPlayer].lightLevels, map[player.worldWithPlayer].blocks, i, j, k, map[player.worldWithPlayer].blocksExposedToSunlight);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
